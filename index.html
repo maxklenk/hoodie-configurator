@@ -1,0 +1,506 @@
+<html lang="de">
+  <head>
+    <title>DPSG Sanssouci - Hoodie Konfigurator</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex">
+
+    <style>
+      body {
+        overflow: hidden;
+        font-family: "Lato", "Helvetica Neue";
+      }
+      .box {
+        position: relative;
+        margin: auto auto;
+        height: 100vh;
+        width: 90vh;
+        max-width: 100%;
+        display: flex;
+      }
+      .content {
+        height: fit-content;
+        display: flex;
+        position: relative;
+        margin: auto;
+      }
+      .content img {
+        max-width: 100%;
+        max-height: 100%;
+        margin: auto;
+        display: block;
+      }
+      .content .logo {
+        position: absolute;
+        left: 27%;
+        top: 21%;
+        width: 46%;
+      }
+
+      /* SELECTOR */
+      .selector {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+      }
+      .selector .color {
+        width: 40px;
+        height: 40px;
+        transition: width 200ms;
+        cursor: pointer;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        padding: 0 4px;
+        font-size: 12px;
+        overflow: hidden;
+        color: transparent;
+      }
+      .selector .color:hover {
+        min-width: 80px;
+        width: auto;
+        color: black;
+      }
+
+      /* -> LOGO color */
+      #logoColorSelector {
+        right: 0;
+        align-items: flex-end;
+      }
+      
+      /* -> SHIRT color */
+      #shirtColorSelector {
+        left: 0;
+        align-items: flex-start;
+      }
+
+      .selectedColor {
+        position: absolute;
+        bottom: 20px;
+        z-index: 5;
+        color: white;
+        background: gray;
+        padding: 10px;
+        box-shadow: 2px 2px 2px 0px #5f5f5f9e;
+        min-width: 140px;
+      }
+      .selectedColor.logo {
+        right: 70px;
+      }
+      .selectedColor.shirt {
+        left: 70px;
+      }
+  
+      .center {
+        text-align: center;
+      }
+      .bold {
+        font-weight: bold;
+      }
+
+      #typeSelector {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        z-index: 20;
+        margin-left: -110px;
+        transition: all 500ms;
+      }
+      #typeSelector.big {
+        bottom: 50%;
+        margin-left: -39vw;
+        margin-bottom: -10vw;
+      }
+      #typeSelector .button {
+        width: 40px;
+        height: 40px;
+        overflow: hidden;
+        border-radius: 50%;
+        border: 5px solid gray;
+        background: white;
+        display: inline-block;
+        padding: 5px;
+        margin: 5px;
+        transition: all 500ms;
+        cursor: pointer;
+      }
+      #typeSelector.big .button {
+          width: 20vw;
+          height: 20vw;
+          padding: 10px;
+      }
+      #typeSelector .button.active {
+        border-color: blue;
+      }
+      #typeSelector .button:hover {
+        border-color: black;
+      }
+      #typeSelector img {
+        max-width: 100%;
+        max-height: 100%;
+        margin: auto;
+        display: block;
+      }
+
+      #cover {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: #696969c9;
+        z-index: 10;
+      }
+    </style>
+    <script type="application/javascript">
+      var logoColors = [
+        { id: 401, name: "White", color: "#ffffff" },
+        //{ id: 460, name: "MAGENTA", color: "#fc9ac3" },
+        { id: 406, name: "Royal Blue", color: "#0457c1" },
+        { id: 470, name: "Antique Gold", color: "#c79b50" },
+        { id: 417, name: "Beige", color: "#ffffe7" },
+        { id: 462, name: "Fuchsia", color: "#f44590" },
+        { id: 405, name: "Navyblue", color: "#2e375e" },
+        { id: 412, name: "Grey", color: "#acb1b4" },
+        //{ id: 419, name: "LEMON YELLOW", color: "#feff01" },
+        { id: 472, name: "Cardinal Red", color: "#b92a56" },
+        { id: 474, name: "Light Green", color: "#c4fc5b" },
+        { id: 402, name: "Black", color: "#22252c" },
+        //{ id: 418, name: "MEDIUM YELLOW", color: "#feff01" },
+        { id: 409, name: "Bordeaux", color: "#8f2c48" },
+        { id: 467, name: "Apple Green", color: "#b2fd00" },
+        { id: 420, name: "Gold Metallic", color: "#c0ac71" },
+        { id: 410, name: "Yellow", color: "#fcef00" },
+        { id: 471, name: "Aubergine", color: "#6f3b62" },
+        { id: 404, name: "Green", color: "#30846a" },
+        { id: 430, name: "Silver Metallic", color: "#c3c4bf" },
+        { id: 415, name: "Orange", color: "#f66e00" },
+        { id: 414, name: "Purple", color: "#52469c" },
+        { id: 468, name: "Aqua Green", color: "#39a7cc" },
+        { id: 403, name: "Neon Blue", color: "#06abfd" },
+        { id: 473, name: "Flame Red", color: "#f70945" },
+        { id: 475, name: "Ice Blue", color: "#bfe4ff" },
+        { id: 413, name: "Turquoise", color: "#036c9c" },
+        { id: 440, name: "Neon Yellow", color: "#fefe3a" },
+        { id: 408, name: "Red", color: "#f6053c" },
+        { id: 465, name: "Sky Blue", color: "#b2e1ff" },
+        { id: 469, name: "Military Green", color: "#686f4e" },
+        { id: 441, name: "Neon Green", color: "#08fb41" },
+        { id: 476, name: "Violet", color: "#d4b9fc" },
+        { id: 466, name: "Lilac", color: "#8ea1e5" },
+        { id: 407, name: "Forest Green", color: "#34563e" },
+        { id: 442, name: "Neon Orange", color: "#fcb100" },
+        { id: 461, name: "Baby Pink", color: "#fc9cb7" },
+        { id: 464, name: "Sappire", color: "#3793ea" },
+        { id: 416, name: "Brown", color: "#684b3b" },
+        { id: 443, name: "Neon Pink", color: "#f50ec0" },
+      ];
+      var hoodiColors = [
+        { name: "Anthracite", color: '#373939', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Anthracite.jpg'},
+        { name: "Black", color: '#000000', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Black.jpg'},
+        { name: "Bottle Green", color: '#004313', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Bottle_Green.jpg'},
+        { name: "Brown", color: '#451a10', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Brown.jpg'},
+        { name: "Burgundy", color: '#5a263d', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Burgundy.jpg'},
+        { name: "Gold", color: '#fcc642', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Gold.jpg'},
+        { name: "Heather Grey", color: '#b1b3b4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Heather_Grey.jpg'},
+        { name: "Navy", color: '#002a5b', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Navy.jpg'},
+        { name: "Pumpkin Orange", color: '#ee7c27', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Pumpkin_Orange.jpg'},
+        { name: "Red", color: '#db001b', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Red.jpg'},
+        { name: "Royal Blue", color: '#006db0', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Royal_Blue.jpg'},
+        { name: "White", color: '#ffffff', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_White.jpg'},
+      ];
+      var shirtFemaleColors = [
+        { name: 'White', color: '#ffffff', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_White.jpg' },
+        { name: 'Black', color: '#000000', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Black.jpg' },
+        { name: 'Navy', color: '#002a5b', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Navy.jpg' },
+        { name: 'Sport Grey (Heather)', color: '#a3a5a4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Sport_Grey_(Heather).jpg' },
+        { name: 'Royal Blue', color: '#006db0', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Royal_Blue.jpg' },
+        { name: 'Red', color: '#db001b', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Red.jpg' },
+        { name: 'Natural', color: '#f5f1e8', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Natural.jpg' },
+        { name: 'Sand', color: '#f6e8c8', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Sand.jpg' },
+        { name: 'Solar Yellow', color: '#ffe93c', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Solar_Yellow.jpg' },
+        { name: 'Gold', color: '#fcc643', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Gold.jpg' },
+        { name: 'Apricot', color: '#f6a800', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Apricot.jpg' },
+        { name: 'Orange', color: '#e75113', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Orange.jpg' },
+        { name: 'Urban Orange', color: '#cc4f00', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Urban_Orange.jpg' },
+        { name: 'Fire Red', color: '#e30411', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Fire_Red.jpg' },
+        { name: 'Sunset Orange', color: '#e74c33', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Sunset_Orange.jpg' },
+        { name: 'Orchid Pink', color: '#fbe0e4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Orchid_Pink.jpg' },
+        { name: 'Sorbet', color: '#cc005c', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Sorbet.jpg' },
+        { name: 'Burgundy', color: '#5b263d', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Burgundy.jpg' },
+        { name: 'Swimming Pool', color: '#2daec4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Swimming_Pool.jpg' },
+        { name: 'Atoll', color: '#0092c3', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Atoll.jpg' },
+        { name: 'Diva Blue', color: '#007088', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Diva_Blue.jpg' },
+        { name: 'Sky Blue', color: '#7ab2dc', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Sky_Blue.jpg' },
+        { name: 'Stone Blue', color: '#417499', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Stone_Blue.jpg' },
+        { name: 'Urban Navy', color: '#101145', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Urban_Navy.jpg' },
+        { name: 'Cobalt Blue', color: '#375885', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Cobalt_Blue.jpg' },
+        { name: 'Millennial Lilac', color: '#6b629a', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Millennial_Lilac.jpg' },
+        { name: 'Radiant Purple', color: '#3b1d66', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Radiant_Purple.jpg' },
+        { name: 'Urban Purple', color: '#2a094e', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Urban_Purple.jpg' },
+        { name: 'Pixel Lime', color: '#d6ff00', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Pixel_Lime.jpg' },
+        { name: 'Orchid Green', color: '#99c32e', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Orchid_Green.jpg' },
+        { name: 'Millennial Mint', color: '#91c0ba', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Millennial_Mint.jpg' },
+        { name: 'Kelly Green', color: '#009149', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Kelly_Green.jpg' },
+        { name: 'Bottle Green', color: '#004413', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Bottle_Green.jpg' },
+        { name: 'Urban Khaki', color: '#454839', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Urban_Khaki.jpg' },
+        { name: 'Ash (Heather)', color: '#e3e4e4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Ash_(Heather).jpg' },
+        { name: 'Pacific Grey', color: '#c0c3c4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Pacific_Grey.jpg' },
+        { name: 'Dark Grey (Solid)', color: '#29363f', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Dark_Grey_(Solid).jpg' },
+        { name: 'Used Black', color: '#1a232d', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Used_Black.jpg' },
+        { name: 'Brown', color: '#461a11', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Brown.jpg' },
+        { name: 'Chocolate', color: '#7e593c', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Chocolate.jpg' },
+      ];
+      var shirtMaleColors = [
+        { name: 'White', color: '#ffffff', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_White.jpg' },
+        { name: 'Black', color: '#000000', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Black.jpg' },
+        { name: 'Navy', color: '#002a5b', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Navy.jpg' },
+        { name: 'Sport Grey (Heather)', color: '#a3a5a4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Sport_Grey_(Heather).jpg' },
+        { name: 'Royal Blue', color: '#006db0', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Royal_Blue.jpg' },
+        { name: 'Red', color: '#db001b', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Red.jpg' },
+        { name: 'Natural', color: '#f5f1e8', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Natural.jpg' },
+        { name: 'Sand', color: '#f6e8c8', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Sand.jpg' },
+        { name: 'Solar Yellow', color: '#ffe93c', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Solar_Yellow.jpg' },
+        { name: 'Gold', color: '#fcc643', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Gold.jpg' },
+        { name: 'Apricot', color: '#f6a800', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Apricot.jpg' },
+        { name: 'Orange', color: '#e75113', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Orange.jpg' },
+        { name: 'Urban Orange', color: '#cc4f00', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Urban_Orange.jpg' },
+        { name: 'Fire Red', color: '#e30411', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Fire_Red.jpg' },
+        { name: 'Sunset Orange', color: '#e74c33', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Sunset_Orange.jpg' },
+        { name: 'Orchid Pink', color: '#fbe0e4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Orchid_Pink.jpg' },
+        { name: 'Sorbet', color: '#cc005c', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Sorbet.jpg' },
+        { name: 'Burgundy', color: '#5b263d', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Burgundy.jpg' },
+        { name: 'Swimming Pool', color: '#2daec4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Swimming_Pool.jpg' },
+        { name: 'Atoll', color: '#0092c3', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Atoll.jpg' },
+        { name: 'Diva Blue', color: '#007088', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Diva_Blue.jpg' },
+        { name: 'Sky Blue', color: '#7ab2dc', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Sky_Blue.jpg' },
+        { name: 'Stone Blue', color: '#417499', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Stone_Blue.jpg' },
+        { name: 'Urban Navy', color: '#101145', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Urban_Navy.jpg' },
+        { name: 'Cobalt Blue', color: '#375885', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Cobalt_Blue.jpg' },
+        { name: 'Millennial Lilac', color: '#6b629a', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Millennial_Lilac.jpg' },
+        { name: 'Radiant Purple', color: '#3b1d66', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Radiant_Purple.jpg' },
+        { name: 'Urban Purple', color: '#2a094e', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Urban_Purple.jpg' },
+        { name: 'Pixel Lime', color: '#d6ff00', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Pixel_Lime.jpg' },
+        { name: 'Orchid Green', color: '#99c32e', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Orchid_Green.jpg' },
+        { name: 'Millennial Mint', color: '#91c0ba', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Millennial_Mint.jpg' },
+        { name: 'Kelly Green', color: '#009149', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Kelly_Green.jpg' },
+        { name: 'Bottle Green', color: '#004413', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Bottle_Green.jpg' },
+        { name: 'Urban Khaki', color: '#454839', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Urban_Khaki.jpg' },
+        { name: 'Ash (Heather)', color: '#e3e4e4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Ash_(Heather).jpg' },
+        { name: 'Pacific Grey', color: '#c0c3c4', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Pacific_Grey.jpg' },
+        { name: 'Dark Grey (Solid)', color: '#29363f', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Dark_Grey_(Solid).jpg' },
+        { name: 'Used Black', color: '#1a232d', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Used_Black.jpg' },
+        { name: 'Brown', color: '#461a11', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Brown.jpg' },
+        { name: 'Chocolate', color: '#7e593c', url: 'https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Chocolate.jpg' },
+      ];
+
+      var imgTag; 
+      var fillTag;
+      var displayLogoColor;
+      var displayShirtColor;
+      function init() {
+        imgTag = document.getElementById('imgTag'); 
+        displayShirtColor = document.getElementById('displayShirtColor');
+        fillTag = document.getElementById('fillTag');
+        displayLogoColor = document.getElementById('displayLogoColor');
+      }
+
+      // Color
+      function drawColors() {
+        var div = document.getElementById('logoColorSelector');
+        div.innerText = '';
+
+        logoColors.sort(function(a, b) {
+          if (a.color > b.color) {
+            return -1
+          }
+          if (a.color < b.color) {
+            return 1
+          }
+          return 0
+        })
+
+        logoColors.forEach(function(color) {
+          var element = document.createElement('div');
+          element.style.backgroundColor = color.color;
+          element.style.height = 100 / logoColors.length + '%';
+          element.innerText = color.name;
+          element.onmouseenter = onMouseenterColor;
+          element.onmouseleave = onMouseleaveColor;
+          element.onclick = onClickColor;
+          element.classList.add('color');
+          div.appendChild(element);
+        })
+
+        // first
+        var logoColor = logoColors[Math.floor(Math.random() * logoColors.length)];
+        fillTag.setAttribute('fill', logoColor.color);
+        displayLogoColor.innerText = logoColor.name;
+      }
+      var colorBefore = null;
+      function onMouseenterColor(event) {
+        colorBefore = fillTag.getAttribute("fill")
+        var color = event.target.style.backgroundColor;
+        fillTag.setAttribute("fill", color)
+      }
+
+      function onMouseleaveColor(event) {
+        fillTag.setAttribute("fill", colorBefore);
+      }
+
+      function onClickColor(event) {
+        colorBefore = fillTag.getAttribute("fill");
+        displayLogoColor.innerText = event.target.innerText;
+      }
+
+      // Color
+      function drawShirts(shirts) {
+        var div = document.getElementById('shirtColorSelector');
+        div.innerText = '';
+
+        shirts.sort(function(a, b) {
+          if (a.color > b.color) {
+            return -1
+          }
+          if (a.color < b.color) {
+            return 1
+          }
+          return 0
+        })
+
+        shirts.forEach(function(color) {
+          var element = document.createElement('div');
+          element.style.backgroundColor = color.color;
+          element.style.height = 100 / shirts.length + '%';
+          element.innerText = color.name;
+          element.dataset.src = color.url;
+          element.onmouseenter = onMouseenterShirt;
+          element.onmouseleave = onMouseleaveShirt;
+          element.onclick = onClickShirt;
+          element.classList.add('color');
+          div.appendChild(element);
+        })
+
+        // preload
+        var head = document.getElementsByTagName('head')[0]
+        shirts.forEach(function(color) {
+          var element = document.createElement('link');
+          element.rel = 'preload';
+          element.href = color.url;
+          element.as = 'image';
+          head.appendChild(element);
+        })
+
+        // first
+        var shirtColor = shirts[Math.floor(Math.random() * shirts.length)];
+        imgTag.src = shirtColor.url;
+        displayShirtColor.innerText = shirtColor.name;
+      }
+      var shirtBefore = null;
+      function onMouseenterShirt(event) {
+        shirtBefore = imgTag.src;
+        var color = event.target.dataset.src;
+        imgTag.src = color; 
+      }
+
+      function onMouseleaveShirt(event) {
+        imgTag.src = shirtBefore;
+      }
+
+      function onClickShirt(event) {
+        shirtBefore = event.target.dataset.src;
+        displayShirtColor.innerText = event.target.innerText;
+      }
+
+      function selectType(type) {
+        document.getElementById('typeSelector').classList.remove('big');
+        document.getElementById('cover').style.display = 'none';
+        drawShirts(type);
+        drawColors();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="logoColorSelector" class="selector">
+    </div>
+    <div id="shirtColorSelector" class="selector">
+    </div>
+
+    <div class="selectedColor logo center">
+      <div>Logo</div>
+      <div id="displayLogoColor" class="bold">SKY BLUE</div>
+    </div>
+
+    <div class="selectedColor shirt center">
+      <div>Stoff</div>
+      <div id="displayShirtColor" class="bold">SKY BLUE</div>
+    </div>
+
+
+    <div id="typeSelector" class="big">
+      <div class="button" onclick="selectType(hoodiColors)">
+        <img src="https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCWUI24/1366_1650_85/BundC_ID203-5050-Hooded-Sweatshirt_Heather_Grey.jpg">
+      </div>
+      <div class="button" onclick="selectType(shirtFemaleColors)">
+        <img src="https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTW04T/1496_1650_85/BundC_T-Shirt-E190--Women_Swimming_Pool.jpg">
+      </div>
+      <div class="button" onclick="selectType(shirtMaleColors)">
+        <img src="https://www.textil-grosshandel.eu/out/pictures/generated/produkt/BCTU03T/1283_1650_85/BundC_T-Shirt-E190_Gold.jpg">
+      </div>
+    </div>
+    <div id="cover">
+    </div>
+
+    <div class="box">
+      <div class="content">
+        <img id="imgTag">
+
+        <svg class="logo" width="728px" height="249px" viewBox="0 0 728 249" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="fillTag" fill="#efefef">
+            <path d="M351.6805,0.124848951 L351.305806,0.249746903 L350.806213,0.49954343 L350.18172,0.874237908 L349.557228,1.49873079 L349.182533,2.12322367 L348.808088,3.12240977 L349.557225,14.3630193 L324.952815,14.6128158 L312.962594,26.9774676 L351.05601,29.8501261 L352.679683,47.335602 L351.180904,46.3364159 C350.725713,46.1087892 350.270336,45.8301416 349.807025,45.4621296 C349.234742,45.1352088 348.527134,44.8057888 348.058702,44.3382934 L346.934616,43.5886572 L345.93543,42.9644166 L344.936244,42.3399237 L343.687264,41.5905373 L342.812978,41.0909448 L341.813792,40.466452 L339.190933,38.9676728 L338.066847,38.3431799 L336.193375,37.4688936 L334.444802,36.5946074 L333.445616,36.0950149 L332.071737,35.470522 L330.572957,34.8460292 L328.824635,34.2215363 L326.826263,33.5970434 L324.078504,32.9725505 L322.329931,32.722754 L318.95768,32.722754 L318.333187,32.847652 L317.084207,33.0974485 L316.085021,33.347245 L315.460528,33.5970415 L314.586242,33.971736 L314.211548,34.2215325 L313.587055,34.596227 L312.712768,35.2207199 L311.463789,36.4696994 C311.300298,36.7966202 311.044194,36.9348824 310.839296,37.2190859 L310.464851,37.7186783 C310.402777,37.8047955 310.277317,38.131529 310.214805,38.2182707 L309.465668,39.4672502 L308.966076,40.4664363 L308.591381,41.3407226 L308.091789,42.9643954 L307.717095,43.9635815 L307.467298,45.0874176 L307.217501,46.2115036 L306.967705,47.4604831 L306.717908,48.9592622 L306.468112,51.082528 L306.343214,53.2057938 L306.343214,59.7005098 L306.468112,61.8237756 L306.717908,64.1965937 L306.967705,65.8202665 L307.092603,66.8194526 L307.342399,68.1933319 L307.717094,70.0668043 L307.96689,71.0659904 L308.341585,72.5647696 L308.591381,73.4390559 L308.841178,74.3133421 L308.966076,74.6880354 L309.215872,75.4374218 C309.398286,75.802186 309.435943,76.1881821 309.590567,76.5615078 L309.840363,77.3108942 L310.09016,77.9353871 L310.214808,78.3100803 L310.464854,78.9345732 L310.839299,79.9337593 L311.089096,80.4333524 L311.46379,81.3076387 L311.713587,81.8072317 L311.963383,82.3068248 L312.338078,83.0562112 L312.587874,83.5558043 L312.962569,84.3049409 L313.337263,85.0543274 L313.961756,86.1784133 L314.211553,86.5531066 L314.586247,87.1775994 L314.836044,87.5522927 L315.460536,88.5514788 L315.960129,89.3008652 L316.459721,90.0502517 L317.084214,90.924538 L317.708707,91.7988243 L318.208299,92.4233171 L318.832792,93.1727036 L319.207487,93.6722967 L319.83198,94.4216831 L321.705452,96.2951555 L322.329945,96.7947486 L322.954438,97.1694418 L323.703824,97.544135 L324.203417,97.7939347 L324.82791,98.0437281 L326.576482,98.4184213 L330.073378,98.4184213 L332.07175,98.0437281 L332.821136,97.7939347 L334.694609,96.9196484 L335.568895,96.4200553 L336.193388,96.0453621 L337.442367,95.2959756 L338.441553,94.5465892 L339.31584,93.9220963 L340.315026,93.1727098 L341.938699,91.7988305 L342.563191,91.2992375 L344.061971,90.0502579 L345.31095,88.926172 L346.684829,87.6771925 L348.058709,86.5531066 C348.497663,86.1141493 349.238747,85.3319783 349.432588,85.1792272 C349.494286,85.1462553 349.978018,84.6666452 350.306625,84.4298408 L351.056011,83.8053479 L351.180909,83.6804481 L351.305807,83.4306484 L351.305807,83.056205 L351.180909,82.9313114 L347.559114,82.8064116 L346.185235,82.5566119 L345.061149,82.1819187 L344.436656,81.8072255 L343.812163,81.3076324 L343.18767,80.6831395 L342.688078,80.0586467 L341.938691,78.6847673 L341.189305,76.5615015 L340.689712,74.9378288 L340.315018,72.9394566 L339.940323,70.8161908 L339.565629,69.192518 L339.190934,67.0692522 L338.81624,65.07088 L338.316647,62.5731645 L338.316647,61.3241856 L338.81624,60.8245932 L340.439913,60.8245932 L341.688892,61.0743897 L343.187671,61.4490842 C344.03498,61.7879954 344.866116,62.0385407 345.685636,62.4482709 L347.059516,63.0727638 L347.933802,63.4474571 L348.433395,63.6970007 C348.937046,64.0599601 349.735585,64.249992 350.181717,64.6961868 L351.430697,65.4455732 L352.804576,66.4447593 L354.303355,67.9435385 L354.802948,68.9427246 L355.677234,77.4358003 L370.290031,77.4358003 L370.914524,70.9410843 L371.289217,69.3174116 L372.038603,67.9435323 L373.537383,66.4447531 L374.036976,66.0700599 C374.468252,65.8544249 374.896712,65.4876624 375.285955,65.1957736 C375.791793,64.8585484 376.360702,64.4161566 376.909628,64.1965875 C377.558662,63.872039 378.152987,63.5126453 378.7831,63.1976512 L379.907186,62.6980581 C380.379303,62.4919775 380.923982,62.2501135 381.405965,62.0735677 L382.530051,61.6988732 L383.154544,61.4490767 L384.653323,61.0743822 L385.902303,60.8245857 L387.525976,60.8245857 L388.025569,61.3241781 L388.025569,62.5731583 C388.016389,62.7584442 387.138481,66.9349104 387.026382,67.5688328 L386.776589,69.1925055 L386.526789,70.441485 L386.152096,72.5647508 L385.902303,73.6888368 L385.652503,74.9378163 L385.27781,76.3116956 L384.903117,77.5606751 L384.403524,78.6847611 L384.02883,79.4341475 L383.654131,80.0586404 L383.154538,80.6831333 L382.530045,81.3076262 L381.281065,82.1819124 L380.15698,82.5566057 L378.7831,82.8064053 L375.161055,82.9312989 L375.036162,83.0561987 L375.036162,83.4306422 L375.161055,83.6804418 C375.260851,83.8188864 375.866923,84.2759531 376.035342,84.4298283 L376.659834,85.0543212 L377.908814,86.1784071 L378.533307,86.8029 L379.407593,87.5522864 L381.031266,88.9261658 L382.030452,89.9253519 L385.028004,92.4233171 L386.02719,93.1727036 C386.027321,93.1726412 391.272596,96.6699736 391.272658,96.6698487 C391.272727,96.6697238 393.122463,97.6722821 393.520824,97.7939347 L394.769803,98.1686279 L396.268582,98.4184213 L399.765727,98.4184213 L401.5143,98.0437281 C401.667176,97.9971428 402.923212,97.4703229 403.013079,97.4192352 L404.386959,96.4200491 L406.635124,94.1718835 C407.372833,93.4341746 407.893845,92.5389062 408.633247,91.798818 L409.507533,90.4249387 L411.630799,87.3024868 C411.630736,87.3024243 413.12964,84.6796279 413.129578,84.6796279 L414.003864,83.056205 L414.628357,81.8072255 L415.377743,80.0586529 L416.002236,78.5598737 L416.876523,76.1868083 L417.376116,74.6880291 L418.000609,72.5647633 L418.500202,70.3165977 L419.249588,66.8194526 L419.374488,65.8202665 L419.624281,64.1965937 L419.749181,62.8229642 L419.998981,59.7005135 L419.998981,53.2057976 L419.874081,51.0825318 L419.624281,48.959266 L419.374488,47.4604868 L419.249588,46.5862005 L418.999795,45.4621146 L418.749995,44.4629285 L418.625101,43.9635859 L418.375302,43.2141994 L418.125508,42.3399131 C418.02234,42.0380341 417.637843,41.150945 417.501015,40.8411339 L416.876523,39.4672546 L416.25203,38.3431687 L415.502643,37.2190827 L414.128764,35.7203036 C413.991812,35.596155 411.818963,34.0067012 411.755698,33.971731 L410.506719,33.4721386 L409.257739,33.0974441 L407.384517,32.7227496 L404.012265,32.7227496 L402.263693,32.9725462 L400.140427,33.4721386 L398.266955,33.971731 L396.393482,34.5962239 L394.896951,35.2077253 L393.395924,35.8452072 L391.522451,36.7194934 L389.024486,37.968473 L386.027184,39.5921457 L385.152898,40.0917381 L380.781466,42.714597 L379.65738,43.4639834 L377.659008,44.7127132 L375.161043,46.3363859 L373.162671,47.7102652 C373.162671,47.7103277 374.786343,29.7252775 374.786343,29.725215 L413.25444,26.8525565 L401.264469,14.6127984 L376.273826,14.4876506 L377.159353,3.37224689 L376.784653,2.24816096 L376.28506,1.4987745 L375.535674,0.749388041 L374.661387,0.249795611 L374.286694,0.12489766 L373.412408,-2.91503795e-07 L352.429789,-2.91503795e-07 L351.680402,0.12489766 L351.6805,0.124848951 Z" id="path4102"></path>
+            <path d="M338.3167,109.659012 L337.942005,110.283567 L337.942005,110.658261 L338.066903,110.90806 L338.3167,111.157854 L338.566496,111.282691 L339.066089,111.532547 L339.565681,111.782347 L340.564867,112.156977 L341.18936,112.406777 L342.688139,112.781533 L343.812225,112.906426 L344.811411,112.906426 L345.435904,112.781533 L345.810599,112.531733 L346.310191,112.156977 L347.434277,111.157854 C349.580648,109.011483 352.012482,107.042398 354.303424,105.037843 L353.803832,113.780706 L353.803832,115.279423 L353.92873,115.903978 L354.053627,116.153778 L354.178525,116.278672 L354.678118,116.403509 L371.664016,116.403509 L372.163609,116.278672 L372.288509,116.153778 L372.413409,115.903978 L372.538303,115.279423 L372.538303,113.780706 L372.038716,105.037843 C372.038653,105.037656 379.532643,111.657391 379.53258,111.657453 L380.032167,112.156984 L380.53176,112.531739 L380.90646,112.781539 L381.530953,112.906433 L382.530139,112.906433 L383.654225,112.781539 L384.653411,112.531739 L385.777497,112.156984 L386.40199,111.907184 L386.776683,111.782353 L387.276276,111.532553 L387.775869,111.282697 L388.025662,111.15786 L388.275462,110.908067 L388.400355,110.658267 L388.400355,110.283574 C388.400355,110.470733 370.040187,82.9313801 370.040312,82.9313801 L356.301771,82.9313801 C356.301646,82.9313801 338.31672,109.659043 338.31672,109.659043 L338.3167,109.659012 Z" id="path4104"></path>
+            <path d="M118.665656,112.805175 C121.383246,106.846745 126.793686,101.992125 128.313736,95.507525 C134.151276,85.930505 136.229626,74.990265 139.731586,65.223265 C146.193036,63.112755 158.299866,66.613745 155.659466,71.012915 C160.800936,83.581365 166.402736,97.506105 174.584556,108.547565 C180.536356,113.468095 171.377846,119.090915 165.370516,113.957425 C159.763346,110.929575 162.410196,105.092635 153.891486,101.864645 C140.357856,98.207605 136.010946,102.575575 133.650226,107.661745 C131.289496,112.747915 130.109366,118.194255 120.492516,115.619835 L119.150916,114.265945 L118.665656,112.805175 Z M141.158816,93.423255 C156.977466,97.430275 156.017566,91.547405 151.970676,84.367925 C147.215966,75.932715 146.648116,76.747595 144.127446,83.393825 C142.923876,86.710985 142.850776,90.146245 141.158816,93.423255 Z" id="text4117" fill-rule="nonzero"></path>
+            <path d="M495.250986,66.0518625 L496.541629,66.0836823 C505.244603,66.2547741 512.90767,65.342485 516.971476,71.979925 C527.951886,83.293835 526.580156,97.416245 519.086506,109.463305 C512.659456,115.715015 502.398956,118.210825 492.820726,115.430465 C475.908826,110.950635 474.085836,96.752045 473.736236,87.703745 L474.145736,86.1105418 C476.386353,77.6401291 480.735712,65.7998646 495.250986,66.0518625 L495.250986,66.0518625 Z M484.631116,87.789475 C483.511756,93.432665 485.003096,102.121555 492.574786,106.479715 C501.231406,115.929915 515.627216,102.936655 513.725136,95.659955 C516.241026,87.954595 513.722136,75.596865 500.862776,72.854425 C490.831956,70.383495 484.588346,81.759255 484.631116,87.789475 Z" id="Shape" fill-rule="nonzero"></path>
+            <path d="M192.995826,116.011745 C178.009146,115.947645 187.998396,104.682445 187.210946,99.630265 C186.932546,88.185395 187.521676,75.993575 185.631306,65.205455 C194.813846,62.104035 203.028616,67.836405 204.984556,74.201665 C210.565476,80.473155 221.241286,94.150395 224.623246,94.955285 C225.760316,85.253315 227.749916,75.140225 225.793576,65.989285 C235.753656,58.979905 243.675646,70.461905 237.439776,76.036535 C237.810736,83.840695 235.049486,91.764835 237.011606,98.411255 C231.457326,104.830525 243.633676,109.648105 235.641466,115.192295 C222.303926,116.670705 221.180916,105.268875 214.889536,100.513335 C210.946806,93.860145 206.042606,86.485195 198.305116,80.953265 C197.831956,91.474455 198.139886,102.573475 199.161456,112.662665 C198.573036,114.078075 194.705726,117.294995 192.995826,116.011745 L192.995826,116.011745 Z" id="text4117-path" fill-rule="nonzero"></path>
+            <path d="M253.624556,112.413275 C246.102266,104.902455 262.807636,105.108935 267.668506,108.939485 C283.951226,109.354775 280.858446,96.788645 269.495366,93.530145 C256.810046,89.876095 247.260476,80.688335 253.110746,73.114985 C254.695286,65.032225 278.179656,58.673605 289.248226,66.897815 C294.193456,75.404915 279.685056,69.956555 273.834136,70.656625 C264.573046,70.898795 259.440886,78.415985 266.697986,82.627815 C278.208056,88.527725 292.563006,93.621965 291.531796,104.445335 C289.989956,115.958285 267.489986,119.156635 253.624556,113.268345 L253.624556,112.413275 Z" id="text4117-path" fill-rule="nonzero"></path>
+            <path d="M76.8763524,112.413275 C69.3540594,104.902455 86.0594344,105.108935 90.9203004,108.939485 C107.203026,109.354775 104.110236,96.788645 92.7471544,93.530145 C80.0618404,89.876095 70.5122704,80.688335 76.3625484,73.114985 C77.9470774,65.032225 101.431456,58.673605 112.500026,66.897815 C117.445246,75.404915 102.936846,69.956555 97.0859364,70.656625 C87.8248484,70.898795 82.6926844,78.415985 89.9497834,82.627815 C101.459866,88.527725 115.814806,93.621965 114.783596,104.445335 C113.241756,115.958285 90.7417814,119.156635 76.8763524,113.268345 L76.8763524,112.413275 Z" id="text4117-path" fill-rule="nonzero"></path>
+            <path d="M433.796506,112.926995 C427.315446,105.697515 441.708446,105.896245 445.896466,109.583335 C459.916776,109.989415 457.271686,97.879405 447.470436,94.751165 C433.561506,91.148935 428.596756,79.002595 434.583486,72.460045 C439.519006,64.196735 464.889326,61.841805 464.980966,73.060185 C459.370186,75.580835 448.814626,69.311785 444.420856,75.477925 C437.913796,79.527985 445.969046,85.959365 452.733446,88.749705 C468.842946,93.564405 471.898186,113.414425 452.216976,116.407845 C446.876926,116.284085 436.204976,116.725405 433.796506,112.926995 L433.796506,112.926995 Z" id="text4121-path" fill-rule="nonzero"></path>
+            <path d="M547.614886,114.401645 C537.024766,110.779665 537.915146,100.319245 536.129756,93.910955 C535.351006,87.515235 536.991206,80.841195 536.744596,75.203565 C530.025006,69.022445 546.523566,63.254425 547.885416,72.734395 C545.659896,79.075295 547.254586,86.666675 546.852486,93.465135 C547.143146,99.113525 547.972636,111.414905 559.419726,108.948885 C572.881416,102.615055 569.588496,86.429085 568.961976,76.592475 C566.863866,73.473145 562.801886,69.406175 569.404666,66.870115 C577.184216,65.956645 581.146746,70.819815 578.602606,75.889455 C578.260936,88.028945 580.941146,102.103575 570.880266,112.344005 C565.011116,117.496625 554.656186,117.963835 547.614886,114.401645 L547.614886,114.401645 Z" id="text4121-path" fill-rule="nonzero"></path>
+            <path d="M593.850526,107.817195 C587.786206,98.252255 588.556606,83.485545 597.637916,75.066395 C601.403786,67.144875 619.687856,62.784285 630.297986,68.927755 C634.751816,79.105115 618.240646,71.126245 612.885836,74.757745 C603.043816,79.262335 601.494396,85.168175 599.949696,92.590635 C598.778266,101.219885 606.883676,112.881945 622.280526,108.057245 C632.887446,107.881615 629.694046,119.585245 618.616106,116.819375 C608.693576,117.343155 598.470026,113.244315 593.850526,107.817195 Z" id="text4121-path" fill-rule="nonzero"></path>
+            <path d="M643.086576,116.082045 C639.524946,109.075265 642.028516,100.601815 641.610966,93.345105 C642.692226,87.305035 644.967736,78.081615 642.520926,70.882515 C641.603706,62.350885 657.442226,70.132385 652.604236,75.546505 C653.216356,87.626715 648.992816,97.663125 652.432076,108.846005 C653.684966,112.754765 651.501636,119.342545 643.086576,116.082045 Z" id="text4121-path" fill-rule="nonzero"></path>
+            <path d="M557.436506,29.217093 C537.206996,29.050848 541.882146,30.517417 521.429956,29.420956 C511.519616,29.402626 503.215506,29.136695 496.004036,29.543815 C477.348726,29.529915 444.346606,28.35021 434.716976,27.846995 C428.308906,27.487583 420.312756,26.18489 424.678346,30.128221 C428.096226,33.292213 429.235306,37.221176 430.134456,41.135379 C431.026786,45.019915 430.853096,51.746165 432.588746,51.780945 C454.010566,52.217855 482.488196,53.082645 501.160286,54.418815 C605.121106,52.455065 615.203416,53.372595 665.388636,53.668815 C673.728096,54.138785 669.790906,49.234275 665.439836,45.320905 C659.556626,38.669909 652.169876,36.384114 644.039486,34.259469 C624.137406,31.005759 608.686896,28.373953 587.778746,28.828548 C571.718126,29.177746 567.204716,29.297367 557.436546,29.217093 L557.436506,29.217093 Z" id="path3880" fill-rule="nonzero"></path>
+            <path d="M138.360816,53.786625 C110.316416,55.124445 90.3777644,59.434295 67.1191244,55.783975 C48.9064144,47.931045 82.0726844,35.168031 83.2612844,34.311481 C103.163366,31.057771 122.914146,33.957625 142.965986,32.158635 C164.660246,31.653325 185.369846,34.828535 207.025146,32.376005 C279.064946,39.508975 313.805026,22.066994 301.543596,33.335183 C300.189216,34.581793 296.154706,43.330768 295.620486,51.553365 C287.122656,54.780785 263.624276,54.693535 254.715736,55.331095 C207.280386,52.670875 184.130076,55.217155 138.360816,53.786625 L138.360816,53.786625 Z" id="path3878" fill-rule="nonzero"></path>
+            <path d="M385.705936,124.408295 C386.902776,124.693785 388.772696,124.071815 389.636986,125.789385 C388.741696,127.018985 389.017156,130.492285 389.588986,132.124485 C387.117376,131.287625 384.632866,130.569895 382.179686,132.214585 C375.645256,133.298095 369.086416,133.764685 362.543656,133.595705 C358.581936,133.217595 354.637416,133.852215 350.683026,132.454755 C347.959416,132.914565 345.259996,132.765385 342.589656,131.463975 C340.765486,131.248845 338.603956,133.419075 336.982096,130.773425 C336.625286,128.619555 336.738926,125.141905 337.810706,125.939515 C341.989386,123.569325 346.283766,125.896015 350.509406,124.921245 C358.800926,127.249825 367.147586,126.491535 375.463946,126.385935 C378.893266,126.385425 382.278376,124.176035 385.706086,124.408295 L385.705936,124.408295 Z" id="path3904" fill-rule="nonzero"></path>
+            <path d="M338.880376,137.228585 C337.797816,137.485915 336.097016,137.035925 335.365736,138.579665 C336.310746,139.816285 336.032826,143.313605 335.406436,144.914755 C338.014456,144.109795 340.636076,143.326465 343.227956,145.004855 C350.117026,146.087535 357.031796,146.554915 363.929626,146.385945 C368.011066,145.963445 372.076656,146.720915 376.149486,145.275065 C379.058526,145.475365 381.963486,145.806315 384.814056,144.263385 C386.789456,144.076175 389.018676,146.005995 390.847876,143.773845 C391.250726,141.578545 391.185996,137.904455 390.004806,138.729805 C385.596226,136.380865 381.072046,138.684105 376.616966,137.712655 C367.766886,140.050145 358.859086,139.293415 349.983156,139.158735 C346.268306,139.050965 342.599756,136.737375 338.880426,137.228595 L338.880376,137.228585 Z" id="path3904-1" fill-rule="nonzero"></path>
+            <path d="M389.592346,150.018845 C390.765466,150.276185 392.608526,149.826205 393.400966,151.369935 C392.369096,152.622905 392.688336,156.102095 393.356966,157.735055 C390.534046,156.871155 387.683436,156.135815 384.881186,157.795055 C377.541146,158.915435 370.172846,159.240715 362.822486,159.222615 C358.274286,158.680995 353.743506,159.574845 349.205876,158.065265 C346.050446,158.274015 342.896346,158.576405 339.805436,157.074485 C337.661836,156.880375 335.260416,158.787315 333.278016,156.564065 C332.841466,154.368745 332.911616,150.694675 334.191596,151.520005 C338.970646,149.197005 343.871336,151.452905 348.699296,150.502875 C358.289616,152.845765 367.942346,152.071445 377.560726,151.961845 C381.587036,151.856265 385.560976,149.517725 389.592376,150.018815 L389.592346,150.018845 Z" id="path3904-1-7" fill-rule="nonzero"></path>
+            <path d="M334.651916,162.809115 C333.396266,163.112015 331.380606,162.601225 330.526676,164.160215 C331.930346,165.287305 330.841946,169.686115 330.753206,170.495305 C333.748506,169.584955 336.779996,168.988285 339.754736,170.585405 C347.704936,171.705775 355.685746,172.031075 363.647086,172.012965 C368.573536,171.465805 373.481296,172.363295 378.395676,170.855635 C381.813836,171.107045 385.229606,171.345105 388.577496,169.864835 C390.892266,169.655745 393.529216,171.611835 395.647586,169.354415 C396.120356,167.123275 396.046656,163.474025 394.658016,164.310375 C389.481726,161.987355 384.173636,164.243275 378.944336,163.293235 C368.429196,165.637335 357.846896,164.906325 347.302416,164.717915 C343.070276,164.546845 338.891696,162.303285 334.651916,162.809155 L334.651916,162.809115 Z" id="path3904-1-4" fill-rule="nonzero"></path>
+            <path d="M394.135886,175.599385 C395.495896,175.907315 397.675656,175.396505 398.600346,176.950465 C397.402886,178.191515 397.749696,181.673415 398.548746,183.315605 C395.098866,182.347585 391.659196,181.825615 388.202286,183.462505 C379.586316,184.422355 370.942316,184.951645 362.317316,184.756645 C357.132746,184.316485 351.967736,185.114065 346.795126,183.645755 C343.095866,183.897155 339.399216,184.135225 335.775986,182.654955 C333.294906,182.320925 330.269456,184.681555 328.085856,181.934365 C327.600686,179.692985 327.750056,176.293345 329.195496,177.100485 C334.797706,174.775455 340.541996,177.058285 346.201316,176.083345 C357.443596,178.430735 368.758026,177.699215 380.032496,177.542315 C384.752096,177.436735 389.410346,175.098185 394.135916,175.599275 L394.135886,175.599385 Z" id="path3904-1-0" fill-rule="nonzero"></path>
+            <path d="M330.555406,188.389665 C329.210026,188.735885 326.629176,188.130285 325.883076,189.830825 C327.499796,190.962395 326.084066,195.491595 326.169136,196.075835 C329.707946,194.974005 333.258446,194.777125 336.806086,196.251775 C345.906676,197.212345 355.036806,197.741935 364.146936,197.547015 C369.619216,197.098035 375.077756,197.921855 380.534046,196.436115 C384.439406,196.687555 388.342036,196.925585 392.167096,195.445325 C394.794136,195.153965 397.931556,197.401465 400.272156,194.784785 C400.839226,192.459825 400.601466,189.057395 399.087046,189.920885 C393.331286,187.488485 387.415276,189.922885 381.596536,188.840045 C369.581526,191.159715 357.493536,190.530515 345.444616,190.332715 C340.461056,190.255415 335.544966,187.876285 330.555406,188.389665 L330.555406,188.389665 Z" id="path3904-1-9" fill-rule="nonzero"></path>
+            <path d="M397.270826,201.179945 C398.733986,201.462295 401.221066,201.024775 402.187566,202.531015 C400.888986,203.799315 401.242926,207.212615 402.116766,208.896135 C398.477696,208.076945 394.842366,207.287035 391.203386,208.956135 C381.556976,210.080255 371.874826,210.452895 362.214766,210.367295 C356.379226,209.902435 350.557196,210.628675 344.736306,209.196345 C340.716336,209.704225 336.726016,209.459335 332.785636,208.235565 C330.119556,208.012485 326.913156,210.148665 324.543746,207.575025 C323.945916,205.243555 324.211176,201.885895 325.780016,202.711135 C331.782456,200.297765 337.956446,202.709135 344.025846,201.630275 C356.559016,203.958775 369.169836,203.315005 381.738866,203.122965 C386.937626,203.045665 392.066016,200.666515 397.271066,201.179915 L397.270826,201.179945 Z" id="path3904-1-48" fill-rule="nonzero"></path>
+            <path d="M326.518726,213.970205 C324.873586,214.247075 322.381246,213.835105 321.186906,215.291265 C322.629446,216.526945 322.236016,219.999625 321.294176,221.686405 C325.218076,220.864575 329.182386,220.066555 333.076176,221.776505 C343.637266,222.807035 354.233266,223.350295 364.805856,223.111565 C370.944036,222.768095 377.068426,223.350105 383.191886,221.986695 C387.517576,222.520705 391.806406,222.235495 396.046366,221.025915 C398.920906,220.802855 402.378036,222.939015 404.932716,220.365395 C405.577226,218.033875 405.291216,214.676265 403.599726,215.501485 C397.128206,213.085585 390.470366,215.505485 383.927306,214.420605 C370.577086,216.736295 357.144346,216.087785 343.755356,215.947595 C337.982396,215.938595 332.294436,213.481695 326.518706,213.970245 L326.518726,213.970205 Z" id="path3904-1-8" fill-rule="nonzero"></path>
+            <path d="M401.780836,226.760475 C403.505156,227.075665 406.148686,226.600415 407.401686,228.081535 C405.885306,229.317225 406.298876,232.789885 407.288846,234.476675 C403.166556,233.651795 398.995436,232.849655 394.903716,234.566575 C383.802686,235.613295 372.663466,236.138705 361.549766,235.901615 C355.098026,235.571895 348.658776,236.134845 342.222526,234.776735 C337.667326,235.311745 333.158776,235.022245 328.710016,233.815965 C325.670296,233.684085 322.208936,235.542475 319.417136,233.305555 C318.687156,231.024395 318.933456,227.404195 320.769966,228.291535 C327.579406,225.853155 334.570336,228.326135 341.449446,227.210665 C355.483086,229.522455 369.603616,228.886315 383.677856,228.737625 C389.741036,228.730625 395.714826,226.274395 401.780766,226.760295 L401.780836,226.760475 Z" id="path3904-1-2" fill-rule="nonzero"></path>
+            <path d="M322.777196,239.550745 C320.959586,239.861305 318.206026,239.394235 316.882636,240.871815 C318.472846,242.107495 318.039136,245.580165 317.001026,247.266935 C321.334996,246.408705 325.708866,245.671115 329.989276,247.356835 C341.631406,248.394455 353.312286,248.950055 364.967746,248.699525 C371.574966,248.288275 378.173376,249.029905 384.763006,247.597015 C389.588776,247.864555 394.423646,248.066295 399.153236,246.606205 C402.429516,246.293005 406.295346,248.623245 409.219536,245.885665 C409.910636,243.558935 409.586326,240.245345 407.733226,241.081785 C400.591936,238.646365 393.261046,241.112485 386.046686,240.000915 C371.329616,242.322375 356.521746,241.675065 341.761816,241.527875 C335.403156,241.520875 329.138296,239.066185 322.777346,239.550545 L322.777196,239.550745 Z" id="path3904-1-45" fill-rule="nonzero"></path>
+            <path d="M176.870156,174.182325 C142.206206,173.277955 105.387886,182.702345 71.4345744,171.667065 C55.6399444,172.226175 25.7019844,179.736665 28.3916744,166.918765 C23.5720644,152.469525 43.9661744,156.949205 49.7516944,159.082125 C69.7301844,155.907875 91.9266844,157.532495 113.757676,160.903705 C153.610476,155.053545 192.518026,159.987335 231.547856,154.108575 C253.942166,150.402955 276.222146,160.365245 298.971736,158.999125 C307.044696,150.397805 316.115206,154.870745 324.917236,159.610955 C327.472296,183.398595 311.494806,170.013855 303.161566,174.504855 C292.718666,176.515485 288.003596,171.127865 277.891506,172.379365 C262.462606,177.686605 246.151606,171.145695 230.346596,173.296095 C225.031136,172.227055 216.808826,174.862235 226.833556,173.503405 C223.663106,174.884575 202.551196,173.458605 202.291776,172.503345 C193.956926,171.317765 195.726426,173.444175 188.776216,173.477435 C184.810956,173.468435 180.814886,174.445045 176.870156,174.182325 Z" id="path3916" fill-rule="nonzero"></path>
+            <path d="M128.001016,239.803395 C88.8314044,237.258985 52.7709744,240.972175 10.4307844,236.855105 C-7.57619545,230.442545 0.0542546,211.631685 15.7513144,218.157405 C32.9447444,223.963295 51.6780944,212.822835 69.6956344,215.421435 C125.500246,227.446895 178.379016,218.727415 239.585106,218.855565 C261.971536,220.158675 284.282426,218.058065 307.141776,224.437335 C313.597906,231.485845 293.623966,230.157855 303.423046,235.672475 C292.663896,244.933275 276.056946,232.144015 262.622136,236.564835 C239.484406,244.929495 214.153406,236.430415 190.275036,238.116685 C169.518836,239.889135 148.853286,240.737255 128.001016,239.803395 Z" id="path3906" fill-rule="nonzero"></path>
+            <path d="M153.378346,209.090615 C108.792476,205.790005 30.5968544,211.583765 19.6044444,199.235305 C20.0448544,191.683955 4.0515844,186.343135 26.7971144,185.486905 C68.8181344,182.328355 115.971066,192.268025 158.166706,192.128805 C200.347776,194.472105 247.529706,195.502625 288.325926,187.722685 C316.363596,188.986985 319.521836,195.871245 313.501326,206.694555 C264.232016,217.089075 204.342056,210.658695 153.378346,209.090615 L153.378346,209.090615 Z" id="path3904-17" fill-rule="nonzero"></path>
+            <path d="M210.158546,145.531615 C247.377096,142.987195 281.641346,146.700405 321.872536,142.583325 C338.982586,136.170765 331.732216,117.359885 316.817036,123.885625 C300.480026,129.691515 282.679826,118.551045 265.559736,121.149655 C212.534766,133.175125 162.289936,124.455635 104.132596,124.583765 C82.8612544,125.886915 61.6616544,123.786285 39.9409544,130.165565 C33.8064144,137.214085 52.7854444,135.886065 43.4744644,141.400695 C53.6976844,150.661505 69.4774444,137.872225 82.2430444,142.293055 C104.228296,150.657715 128.297486,142.158635 150.986496,143.844925 C170.708786,145.617365 190.344956,146.465475 210.158546,145.531615 Z" id="path3906-8" fill-rule="nonzero"></path>
+            <path d="M550.816836,175.925665 C585.480796,175.021315 622.299116,184.445705 656.252416,173.410415 C672.047056,173.969515 701.985006,181.480015 699.295356,168.662115 C704.114936,154.212865 683.720816,158.692565 677.935306,160.825485 C657.956806,157.651235 635.760326,159.275835 613.929326,162.647055 C574.076536,156.796885 535.168986,161.730675 496.139146,155.851915 C473.744846,152.146295 451.464856,162.108585 428.715266,160.742465 C420.642306,152.141165 411.571796,156.614095 402.769776,161.354295 C400.214706,185.141945 416.192196,171.757215 424.525436,176.248195 C434.968336,178.258845 439.683406,172.871215 449.795506,174.122715 C465.224386,179.429955 481.535396,172.889045 497.340396,175.039435 C502.655876,173.970395 510.878176,176.605595 500.853446,175.246755 C504.023896,176.627925 525.135806,175.201955 525.395226,174.246705 C533.730076,173.061115 531.960566,175.187525 538.910786,175.220785 C542.876046,175.211785 546.872106,176.188385 550.816836,175.925665 L550.816836,175.925665 Z" id="path3916-5" fill-rule="nonzero"></path>
+            <path d="M599.685986,241.546755 C638.855586,239.002335 674.916016,242.715525 717.256196,238.598455 C735.263196,232.185895 727.632746,213.375025 711.935696,219.900755 C694.742286,225.706645 676.008916,214.566175 657.991376,217.164785 C602.186756,229.190235 549.307976,220.470765 488.101896,220.598915 C465.715466,221.902015 443.404576,219.801425 420.545226,226.180685 C414.089096,233.229205 434.063026,231.901195 424.263966,237.415815 C435.023096,246.676625 451.630056,233.887365 465.064876,238.308185 C488.202596,246.672845 513.533596,238.173765 537.411966,239.860035 C558.168166,241.632475 578.833716,242.480615 599.685986,241.546755 Z" id="path3906-7" fill-rule="nonzero"></path>
+            <path d="M574.308656,210.833965 C618.894516,207.533355 697.090156,213.327105 708.082556,200.978665 C707.642146,193.427305 723.635436,188.086485 700.889896,187.230255 C658.868856,184.071705 611.715946,194.011375 569.520306,193.872145 C527.339236,196.215455 480.157296,197.245975 439.361076,189.466025 C411.323406,190.730325 408.165156,197.614595 414.185676,208.437895 C463.454976,218.832425 523.344946,212.402035 574.308656,210.833965 Z" id="path3904-17-6" fill-rule="nonzero"></path>
+            <path d="M517.528456,147.274975 C480.309906,144.730545 446.045656,148.443755 405.814466,144.326665 C388.704416,137.914105 395.954776,119.103225 410.869966,125.628975 C427.206976,131.434865 445.007176,120.294395 462.127266,122.893005 C515.152236,134.918475 565.397066,126.198975 623.554406,126.327115 C644.825756,127.630255 666.025346,125.529625 687.746056,131.908915 C693.880596,138.957425 674.901556,137.629405 684.212526,143.144035 C673.989296,152.404855 658.209576,139.615585 645.443956,144.036405 C623.458706,152.401065 599.389516,143.901975 576.700506,145.588275 C556.978216,147.360715 537.342046,148.208825 517.528456,147.274975 L517.528456,147.274975 Z" id="path3906-8-1" fill-rule="nonzero"></path>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <script>
+      init()
+      drawShirts(hoodiColors);
+      drawColors();
+    </script>
+  </body>
+</html> 
